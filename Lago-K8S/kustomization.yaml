@@ -15,4 +15,3 @@ secretGenerator:
 - name: lago-secret
   envs:
   - secret.env
-  nameSuffix: ""
