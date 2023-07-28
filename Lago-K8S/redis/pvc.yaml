@@ -1,0 +1,15 @@
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes/service: lago-redis-data
+  name: lago-redis-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: gp3-retain-sc # This is the storage class name that we created in CICD
+  resources:
+    requests:
+      storage: 20Gi

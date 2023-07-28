@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pdf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/service: pdf
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/network: "lago-default"
+        app.kubernetes.io/service: pdf
+    spec:
+      containers:
+        - image: getlago/lago-gotenberg:7
+          name: pdf
+          resources: {}
+      restartPolicy: Always

@@ -1,0 +1,12 @@
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lago-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: gp2 # This is the storage class name that we created in CICD
+  resources:
+    requests:
+      storage: 20Gi

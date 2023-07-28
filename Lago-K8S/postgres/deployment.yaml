@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    spec:
+      containers:
+        - env:
+            - name: PGDATA
+              value: /data/postgres/new
+            - name: POSTGRES_DB
+              value: lago
+            - name: POSTGRES_PASSWORD
+              value: changeme
+            - name: POSTGRES_USER
+              value: lago
+          image: postgres:14.0-alpine
+          name: lago-postgres
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - mountPath: /data/postgres
+              name: lago-postgres-pvc
+      restartPolicy: Always
+      volumes:
+        - name: lago-postgres-pvc
+          persistentVolumeClaim:
+            claimName: lago-postgres-pvc
