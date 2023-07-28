@@ -20,7 +20,10 @@ spec:
             - ./scripts/start.sh
           env:
             - name: DATABASE_URL
-              value: postgresql://lago:changeme@db:5432/lago
+              valueFrom:
+                secretKeyRef:
+                  name: app-lago-secret
+                  key: DATABASE_URL
             - name: ENCRYPTION_DETERMINISTIC_KEY
               value: ${LAGO_ENCRYPTION_DETERMINISTIC_KEY:-your-encrpytion-deterministic-key}
             - name: ENCRYPTION_KEY_DERIVATION_SALT
