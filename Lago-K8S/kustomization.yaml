@@ -10,12 +10,6 @@ resources:
 - ./postgres
 
 
-configMapGenerator:
-- name: lago-configmap
-  envs:
-  - configmap.env
-
-
 secretGenerator:
 - name: lago-secret
   envs:

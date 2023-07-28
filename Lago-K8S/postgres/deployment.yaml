@@ -12,12 +12,9 @@ spec:
         - env:
             - name: PGDATA
               value: /data/postgres/new
-            - name: POSTGRES_DB
-              value: lago
-            - name: POSTGRES_PASSWORD
-              value: changeme
-            - name: POSTGRES_USER
-              value: lago
+          envFrom:
+            - secretRef:
+                name: app-lago-secret
           image: postgres:14.0-alpine
           name: lago-postgres
           ports:
