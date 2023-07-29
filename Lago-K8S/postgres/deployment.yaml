@@ -15,17 +15,17 @@ spec:
             - name: POSTGRES_DB
               valueFrom:
                 secretKeyRef:
-                  name: app-lago-secret
+                  name: lago-secret
                   key: POSTGRES_DB
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: app-lago-secret
+                  name: lago-secret
                   key: POSTGRES_PASSWORD
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: app-lago-secret
+                  name: lago-secret
                   key: POSTGRES_USER
           image: postgres:14.0-alpine
           name: lago-postgres
