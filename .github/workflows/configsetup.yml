@@ -38,10 +38,10 @@ jobs:
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> secret.env
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> secret.env
           echo "DATABASE_URL=postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@db:5432/${{ secrets.POSTGRES_DB }}" >> secret.env
+          echo "API_SECRET=${{ secrets.API_SECRET }}" >> secret.env
+
 
       - name: test postgres lago
         run: |
           cd Lago-K8S
-          kustomize build . | kubectl delete -f - || true
-          sleep 5
           kustomize build . | kubectl apply -f -
