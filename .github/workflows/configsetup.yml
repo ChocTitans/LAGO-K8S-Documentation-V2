@@ -42,6 +42,4 @@ jobs:
       - name: test postgres lago
         run: |
           cd Lago-K8S
-          kustomize build . | kubectl delete -f -
-          sleep 5
           kustomize build . | kubectl apply -f -
