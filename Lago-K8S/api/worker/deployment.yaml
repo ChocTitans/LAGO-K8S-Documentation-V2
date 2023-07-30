@@ -2,19 +2,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app.kubernetes.io/name: api-worker
-  name: api-worker
+    app.kubernetes.io/name: lago-api-worker
+  name: lago-api-worker
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: api-worker
+      app.kubernetes.io/name: lago-api-worker
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: api-worker
+        app.kubernetes.io/name: lago-api-worker
         app.kubernetes.io/network: "lago-default"
     spec:
       containers:
@@ -33,7 +33,10 @@ spec:
             - name: ENCRYPTION_PRIMARY_KEY
               value: ${LAGO_ENCRYPTION_PRIMARY_KEY:-your-encrpytion-primary-key}
             - name: LAGO_API_URL
-              value: http://localhost:3000
+              valueFrom:
+                configMapKeyRef:
+                  name: lago-configmap
+                  key: LAGO_API_URL
             - name: LAGO_AWS_S3_ACCESS_KEY_ID
               value: ${LAGO_AWS_S3_ACCESS_KEY_ID:-azerty123456}
             - name: LAGO_AWS_S3_BUCKET
@@ -47,13 +50,19 @@ spec:
             - name: LAGO_DISABLE_SEGMENT
               value: ${LAGO_DISABLE_SEGMENT}
             - name: LAGO_FRONT_URL
-              value: http://localhost
+              valueFrom:
+                configMapKeyRef:
+                  name: lago-configmap
+                  key: LAGO_FRONT_URL
             - name: LAGO_GCS_BUCKET
               value: ${LAGO_GCS_BUCKET:-}
             - name: LAGO_GCS_PROJECT
               value: ${LAGO_GCS_PROJECT:-}
             - name: LAGO_PDF_URL
-              value: http://pdf:3000
+              valueFrom:
+                configMapKeyRef:
+                  name: lago-configmap
+                  key: LAGO_PDF_URL
             - name: LAGO_REDIS_CACHE_PASSWORD
               value: ${LAGO_REDIS_CACHE_PASSWORD}
             - name: LAGO_REDIS_CACHE_URL
@@ -74,7 +83,10 @@ spec:
             - name: REDIS_PASSWORD
               value: ${REDIS_PASSWORD}
             - name: REDIS_URL
-              value: redis://redis:6379
+              valueFrom:
+                configMapKeyRef:
+                  name: lago-configmap
+                  key: LAGO_REDIS_URL
             - name: RSA_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -83,7 +95,7 @@ spec:
             - name: SECRET_KEY_BASE
               value: ${SECRET_KEY_BASE:-your-secret-key-base-hex-64}
           image: getlago/api:v0.40.0-beta
-          name: lago-worker
+          name: lago-api-worker
           resources: {}
           volumeMounts:
             - mountPath: /app/storage

@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-clock
+  name: lago-api-clock
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/service: api-clock
+      app.kubernetes.io/service: lago-api-clock
   template:
     metadata:
       labels:
         app.kubernetes.io/network: "lago-default"
-        app.kubernetes.io/service: api-clock
+        app.kubernetes.io/service: lago-api-clock
     spec:
       containers:
         - args:
@@ -29,7 +29,10 @@ spec:
             - name: ENCRYPTION_PRIMARY_KEY
               value: ${LAGO_ENCRYPTION_PRIMARY_KEY:-your-encrpytion-primary-key}
             - name: LAGO_API_URL
-              value: http://localhost:3000
+              valueFrom:
+                configMapKeyRef:
+                  name: lago-configmap
+                  key: LAGO_API_URL
             - name: LAGO_RSA_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -42,7 +45,10 @@ spec:
             - name: REDIS_PASSWORD
               value: ${REDIS_PASSWORD}
             - name: REDIS_URL
-              value: redis://redis:6379
+              valueFrom:
+                configMapKeyRef:
+                  name: lago-configmap
+                  key: LAGO_REDIS_URL
             - name: RSA_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -51,7 +57,7 @@ spec:
             - name: SECRET_KEY_BASE
               value: ${SECRET_KEY_BASE:-your-secret-key-base-hex-64}
           image: getlago/api:v0.40.0-beta
-          name: lago-clock
+          name: lago-api-clock
           resources: {}
       restartPolicy: Always
 status: {}

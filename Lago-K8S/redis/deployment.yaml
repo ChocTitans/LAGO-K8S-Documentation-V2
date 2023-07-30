@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redis
+  name: lago-redis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: redis
+      app.kubernetes.io/name: lago-redis
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
         app.kubernetes.io/network: lago-default
-        app.kubernetes.io/name: redis
+        app.kubernetes.io/name: lago-redis
     spec:
       containers:
         - args:
@@ -23,7 +23,6 @@ spec:
           name: lago-redis
           ports:
             - containerPort: 6379
-          resources: {}
           volumeMounts:
             - mountPath: /data
               name: lago-redis-data

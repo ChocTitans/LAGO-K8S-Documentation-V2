@@ -1,21 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: front
+  name: lago-front
 spec:
   selector: 
     matchLabels:
-      app.kubernetes.io/name: front
+      app.kubernetes.io/name: lago-front
   template:
     metadata:
       labels:
         app.kubernetes.io/network: lago-default
-        app.kubernetes.io/name: front 
+        app.kubernetes.io/name: lago-front 
     spec:
       containers:
         - env:
             - name: API_URL
-              value: http://localhost:3000
+              valueFrom:
+                configMapKeyRef:
+                  name: lago-configmap
+                  key: LAGO_API_URL
             - name: APP_ENV
               value: ${APP_ENV:-production}
             - name: CODEGEN_API
@@ -30,5 +33,4 @@ spec:
           name: lago-front
           ports:
             - containerPort: 80
-          resources: {}
       restartPolicy: Always

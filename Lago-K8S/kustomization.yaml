@@ -4,9 +4,17 @@ kind: Kustomization
 resources:
 - ./postgres
 - ./api
-
+- ./redis
+- ./front
+- ./pdf
 
 secretGenerator:
 - name: lago-secret
   envs:
   - secret.env
+
+
+configMapGenerator:
+- name: lago-configmap
+  envs:
+  - configmap.env
