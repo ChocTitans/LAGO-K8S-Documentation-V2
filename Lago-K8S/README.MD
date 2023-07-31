@@ -12,15 +12,15 @@ We're using kustomization to deploy all the ressources, in the main root there's
 
 Add them to your repository's secrets : 
 
-1- Go to your repository's settings.
+- Go to your repository's settings.
 
-2- Under the settings, navigate to the 'Secrets' section.
+- Under the settings, navigate to the 'Secrets' section.
 
-3- Click on 'New repository secret' or 'Add a secret environment' button.
+- Click on 'New repository secret' or 'Add a secret environment' button.
 
-4- For the name, enter `LAGO_API_URL`. # example
+- For the name, enter `LAGO_API_URL`. # example
 
-5- Input the new master key value in the 'Value' field.
+- Input the new master key value in the 'Value' field.
 
 These secrets and configmap has to be defined in a workflow `Github Actions` : 
 
