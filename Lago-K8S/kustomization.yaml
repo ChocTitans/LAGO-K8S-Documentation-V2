@@ -13,12 +13,3 @@ resources:
 - ./redis
 - ./front
 
-secretGenerator:
-- name: lago-secret
-  envs:
-  - secret.env
-
-configMapGenerator:
-- name: lago-configmap
-  envs:
-  - configmap.env
