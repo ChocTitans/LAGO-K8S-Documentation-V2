@@ -1,98 +1,127 @@
 ### **Lago deployment in K8s**
 
-We will start by deploying PostgreSQL DB and Redis. First of all, we need to set up a PVC/PV/SC for both of them. To achieve this, follow the steps below:
-
-Create an EBS volume in EC2 Edit the volume ID in `lago-postgres-data-pvc-pv-sc.yaml` and `lago-redis-data-pv-pvc.yaml` as shown below:
-
-## Requirements
+### **Requirements**
 
 - EBS CSI DRIVER `Will be added in CICD` [@OfficialDocumentation](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html)
 
-### **For Postgres :**
 
-<img src="./assets/imgs/VolumeID.png" width="100%">
+### **Kustomization**
 
-File : `lago-postgres-data-pvc-pv-sc.yaml` (Line 23)
+We're using kustomization to deploy all the ressources, in the main root there's `kustomization.yaml` that specifies every deployment/service/pvc folder and also using it for secrets/configmap.
 
-```
-  storageClassName: lago-postgres-data-storageclass
-  awsElasticBlockStore:
-    volumeID: 	vol-XXXXXXXXXXX
-    fsType: ext4
-```
 
-```
-kubectl apply -f .\lago-postgres-data-pvc-pv-sc.yaml
-```
+Add them to your repository's secrets : 
 
-Apply the PostgreSQL deployment and service manifests:
+1- Go to your repository's settings.
+2- Under the settings, navigate to the 'Secrets' section.
+3- Click on 'New repository secret' or 'Add a secret environment' button.
+4- For the name, enter `LAGO_API_URL`. # example
+5- Input the new master key value in the 'Value' field.
+
+These secrets and configmap has to be defined in a workflow `Github Actions` : 
 
 ```
-kubectl apply -f .\db-deployment.yaml
-kubectl apply -f .\db-service.yaml
+      - name: Create ConfigMap file
+        run: |
+          echo "LAGO_API_URL=${{ env.LAGO_API_URL }}" > configmap.env
+          echo "LAGO_FRONT_URL=${{ env.LAGO_FRONT_URL }}" >> configmap.env
+          echo "LAGO_REDIS_URL=${{ env.LAGO_FRONT_URL }}" >> configmap.env
+          echo "LAGO_PDF_URL=${{ env.LAGO_FRONT_URL }}" >> configmap.env
+
+
+      - name: Create secrets file
+        run: |
+          echo "API_SECRET=${{ secrets.API_SECRET }}" >> secret.env
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> secret.env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_DB }}" >> secret.env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_DB }}" >> secret.env
+          echo "DATABASE_URL=postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@db:5432/${{ secrets.POSTGRES_DB }}" >> secret.env 
+
+```
+in `DATABASE_URL`, @`DB` has to match to postgres service's name and since we have `namePrefix: app-` in kustomization.yaml then it'll be `app-lago-postgres` (by default)
+
+Same goes for `LAGO_REDIS_URL` : redis://<redisservicename>:6379 => `redis://app-lago-redis:6379` (by default)
+
+
+It will create a secret/configmap based on these variables and can be modified only in Github repo's secret variables.
+
+---
+
+### **Secrets (Examples)**
+
+**Postgres**
+
+These are defined in `POSTGRES` folder.
+
+Same goes for `POSTGRES_PASSWORD`,`POSTGRES_USER`
+
+File : `./postgres/deployment.yaml`
+```
+  - name: POSTGRES_DB
+    valueFrom:
+      secretKeyRef:
+        name: lago-secret
+        key: POSTGRES_DB
 ```
 ---
 
-### **For Redis (same steps as PostgreSQL):**
+**Api**
+
+These are defined in `API` folder.
+
+ `DATABASE_URL`, `API_SECRET`
+
+File : `./api/deployment.yaml`, same goes for `./api/worker/deployment.yaml`, `./api/clock/deployment.yaml`
 
 ```
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: lago-redis-data-storageclass
-  awsElasticBlockStore:
-    volumeID: 	vol-XXXXXXXXXXX
-    fsType: ext4
-
+  - name: LAGO_RSA_PRIVATE_KEY
+    valueFrom:
+      secretKeyRef:
+        name: lago-secret
+        key: API_SECRET
 ```
 
-Apply the Redis deployment and service manifests:
+```
+  - name: DATABASE_URL
+    valueFrom:
+      secretKeyRef:
+        name: lago-secret
+        key: DATABASE_URL
+```
+
+### **ConfigMap (Examples)**
+
+Also have to edit them in repo's secret variables, by default `LAGO_API_URL:http://localhost:3000` and `LAGO_FRONT_URL:http://localhost`
+
+**Api**
 
 ```
-kubectl apply -f .\redis-deployment.yaml
-kubectl apply -f .\redis-service.yaml
+  - name: LAGO_API_URL
+    valueFrom:
+      configMapKeyRef:
+        name: lago-configmap
+        key: LAGO_API_URL
+```
+
+```
+  - name: LAGO_FRONT_URL
+    valueFrom:
+      configMapKeyRef:
+        name: lago-configmap
+        key: LAGO_FRONT_URL
 ```
 
 ---
 
-### **Front Deployment/service :**
+Once everything is setup, To apply all the resources, run the following command:
 
-```
-kubectl apply -f .\front-deployment.yaml
-kubectl apply -f .\front-service.yaml  
-```
+`kustomize build . | kubectl apply -f - `
 
-To port forward the frontend service:
+If you want to delete all the resources:
 
-```
-kubectl port-forward -n default service/front 80:80
-```
+`kustomize build . | kubectl delete -f - `
 
-----------------------------------------------------------------------------------------------------------------------
-
-### **Api Deployment/service :**
-
-Create 2 EBS Volume with your desired Storage Size then edit the volume ID in both `lago-apiworker-data-pvc-pv.yaml` and `lago-storage-api-data-pvc-pv.yaml` as needed.
-
-```
-kubectl apply -f .\lago-storage-api-data-pvc-pv.yaml
-kubectl apply -f .\lago-apiworker-data-pvc-pv.yaml 
-```
-
-Apply the API deployment and service manifests:
-
-```
-kubectl apply -f .\api-deployment.yaml   
-kubectl apply -f .\api-service.yaml
-```
-
-### **For Api-Worker/Clock :**
-
-Apply the API-Worker and Clock deployment manifests:
-
-
-```
-kubectl apply -f .\api-clock-deployment.yaml
-kubectl apply -f .\api-worker-deployment.yaml
-```
+---
 
 For the RSA_PRIVATE_KEY **All of them**
 
@@ -102,40 +131,11 @@ First you have to generate an RSA with :
 openssl genpkey -algorithm RSA -out private_key.pem
 ```
 
-Open the file and remove the `-----BEGIN PRIVATE KEY-----` and `-----END PRIVATE KEY-----`
-
 ```
 openssl base64 -in private_key.pem -out private_key_base64.txt
 ```
 
-Create a `secret.yaml`
 
-```
-apiVersion: v1
-kind: Secret
-metadata:
-  name: my-rsa-secret
-type: Opaque
-data:
-  API_SECRET : <put the value of private_key_base64>
-```
-
-In every of these file `api-clock-deployment.yaml` `api-deployment.yaml` `api-worker-deployment.yaml`, instead of this :
-
-```
-- name: LAGO_RSA_PRIVATE_KEY
-  value: <rsa_KEY>
-```
-
-Load the secret that you have just added :
-
-```
-  - name: LAGO_RSA_PRIVATE_KEY
-    valueFrom:
-      secretKeyRef:
-        name: my-rsa-secret
-        key: API_SECRET
-```
 
 
 ### **For PDF/Network policy:**
