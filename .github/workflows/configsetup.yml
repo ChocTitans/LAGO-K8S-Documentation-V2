@@ -40,8 +40,8 @@ jobs:
         run: |
           cd Lago-K8S
           echo "POSTGRES_DB=lago" > secret.env
-          echo "POSTGRES_PASSWORD=mtoub" >> secret.env
-          echo "POSTGRES_USER=worthypasswd" >> secret.env
+          echo "POSTGRES_PASSWORD=worthypasswd" >> secret.env
+          echo "POSTGRES_USER=mtoub" >> secret.env
           echo "DATABASE_URL=postgresql://mtoub:worthypasswd@app-lago-postgres:5432/lago" >> secret.env
           echo "API_SECRET=${{ secrets.API_SECRET }}" >> secret.env
 
