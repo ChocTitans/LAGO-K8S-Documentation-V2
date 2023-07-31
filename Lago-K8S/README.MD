@@ -140,32 +140,12 @@ openssl base64 -in private_key.pem -out private_key_base64.txt
 ```
 
 
-
-
-### **For PDF/Network policy:**
-
-```
-kubectl apply -f .\lago-default-networkpolicy.yaml
-kubectl apply -f .\pdf-deployment.yaml
-```
-
-
-To test if everything is working :
-
-```
-kubectl port-forward -n default service/front 80:80
-kubectl port-forward -n default service/api 3000:3000
-```
 ----------------------------------------------------------------------------------------------------------------------------
 
 For the ingress, you must install ALB : [@ALBIngress](https://github.com/TrouveTaVoie/eks-cluster)
 
-```
-kubectl apply -f .\ingress-front.yaml
-```
 
-once you add the certificate / domain name, make sure to edit the LAGO_API_URL and LAGO_FRONT_URL in : `Api-deployment`, `Api-Clock-deployment`, `api-worker-deployment`.
-
+once you add the certificate / domain name, make sure to edit the LAGO_API_URL and LAGO_FRONT_URL in your github repo's variables.
 
 ---
 
