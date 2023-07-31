@@ -12,6 +12,8 @@ resources:
 - ./api
 - ./redis
 - ./front
+- ./pdf
+- ./network
 
 secretGenerator:
 - name: lago-secret
