@@ -8,5 +8,3 @@ resources:
 - ./service.yaml
 - ./ingress.yaml
 - ./pvc.yaml
-- ./worker
-- ./clock
