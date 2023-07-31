@@ -20,6 +20,21 @@ Add them to your repository's secrets :
 
 - For the name, enter `LAGO_API_URL` and the other variables.
 
+### **Kustomization**
+
+We're using kustomization to deploy all the ressources, in the main root there's `kustomization.yaml` that specifies every deployment/service/pvc folder and also using it for secrets/configmap.
+
+
+Add them to your repository's secrets : 
+
+- Go to your repository's settings.
+
+- Under the settings, navigate to the 'Secrets' section.
+
+- Click on 'New repository secret' or 'Add a secret environment' button.
+
+- For the name, enter `LAGO_API_URL` and the other variables.
+
 - Input the new master key value in the 'Value' field.
 
 These secrets and configmap has to be defined in a workflow `Github Actions` : 
@@ -139,7 +154,6 @@ openssl genpkey -algorithm RSA -out private_key.pem
 openssl base64 -in private_key.pem -out private_key_base64.txt
 ```
 
-Edit it in API_SECRET (Github Repo's secret variable) and remove `=` in the end.
 ----------------------------------------------------------------------------------------------------------------------------
 
 For the ingress, you must install ALB : [@ALBIngress](https://github.com/TrouveTaVoie/eks-cluster)
