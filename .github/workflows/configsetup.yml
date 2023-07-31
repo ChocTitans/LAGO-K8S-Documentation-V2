@@ -42,6 +42,7 @@ jobs:
 
       - name: Create ConfigMap file
         run: |
+          cd Lago-K8S
           echo "LAGO_API_URL=${{ env.LAGO_API_URL }}" > configmap.env
           echo "LAGO_FRONT_URL=${{ env.LAGO_FRONT_URL }}" >> configmap.env
           echo "LAGO_REDIS_URL=${{ env.LAGO_FRONT_URL }}" >> configmap.env
