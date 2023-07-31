@@ -5,8 +5,13 @@ on:
 
 env:
   AWS_ACCOUNT_ID: 230410870031
-  REGION : eu-west-2
+  REGION: eu-west-2
   AWS_NAME_CLUSTER: test-cluster-3
+
+  LAGO_API_URL: https://api.promosales.me
+  LAGO_FRONT_URL: https://lago.promosales.me
+  LAGO_PDF_URL: http://pdf:3000
+  LAGO_REDIS_URL: redis://app-lago-redis:6379
 
 jobs:
   setup_config_secret:
@@ -45,8 +50,8 @@ jobs:
           cd Lago-K8S
           echo "LAGO_API_URL=${{ env.LAGO_API_URL }}" > configmap.env
           echo "LAGO_FRONT_URL=${{ env.LAGO_FRONT_URL }}" >> configmap.env
-          echo "LAGO_REDIS_URL=${{ env.LAGO_FRONT_URL }}" >> configmap.env
-          echo "LAGO_PDF_URL=${{ env.LAGO_FRONT_URL }}" >> configmap.env
+          echo "LAGO_REDIS_URL=${{ env.LAGO_REDIS_URL }}" >> configmap.env
+          echo "LAGO_PDF_URL=${{ env.LAGO_PDF_URL }}" >> configmap.env
 
 
       - name: test postgres lago
