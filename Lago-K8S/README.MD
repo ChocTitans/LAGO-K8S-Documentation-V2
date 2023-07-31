@@ -18,7 +18,7 @@ Add them to your repository's secrets :
 
 - Click on 'New repository secret' or 'Add a secret environment' button.
 
-- For the name, enter `LAGO_API_URL`. # example
+- For the name, enter `LAGO_API_URL` and the other variables.
 
 - Input the new master key value in the 'Value' field.
 
@@ -44,7 +44,7 @@ These secrets and configmap has to be defined in a workflow `Github Actions` :
 ```
 in `DATABASE_URL`, @`DB` has to match to postgres service's name and since we have `namePrefix: app-` in kustomization.yaml then it'll be `app-lago-postgres` (by default)
 
-Same goes for `LAGO_REDIS_URL` : redis://<redisservicename>:6379 => `redis://app-lago-redis:6379` (by default)
+Same goes for `LAGO_REDIS_URL` : redis://redisservicename:6379 => `redis://app-lago-redis:6379` (by default)
 
 
 It will create a secret/configmap based on these variables and can be modified only in Github repo's secret variables.
