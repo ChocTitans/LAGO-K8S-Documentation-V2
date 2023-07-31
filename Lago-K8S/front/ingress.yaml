@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   namespace: default
-  name: lago-front
+  name: lago-front-ingress
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
@@ -13,23 +13,13 @@ metadata:
 spec:
   ingressClassName: alb
   rules:
-    - host: "lago.domain.com"
+    - host: "lago.promosales.me"
       http:
         paths:
         - path: /
           pathType: Prefix
           backend:
             service:
-              name: front
+              name: lago-front
               port:
                 number: 80
-    - host: "api.domain.com"
-      http:
-        paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: api
-              port:
-                number: 3000

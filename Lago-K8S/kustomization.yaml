@@ -1,18 +1,24 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namePrefix: app-
+metadata:
+  name: lago-ressources
+commonLabels:
+  app: lago
 
+  
 resources:
 - ./postgres
 - ./api
 - ./redis
 - ./front
 - ./pdf
+- ./network
 
 secretGenerator:
 - name: lago-secret
   envs:
   - secret.env
-
 
 configMapGenerator:
 - name: lago-configmap

@@ -66,7 +66,10 @@ spec:
             - name: LAGO_REDIS_CACHE_PASSWORD
               value: ${LAGO_REDIS_CACHE_PASSWORD}
             - name: LAGO_REDIS_CACHE_URL
-              value: redis://redis:6379
+              valueFrom:
+                configMapKeyRef:
+                  name: lago-configmap
+                  key: LAGO_REDIS_URL
             - name: LAGO_RSA_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -96,7 +99,6 @@ spec:
               value: ${SECRET_KEY_BASE:-your-secret-key-base-hex-64}
           image: getlago/api:v0.40.0-beta
           name: lago-api-worker
-          resources: {}
           volumeMounts:
             - mountPath: /app/storage
               name: lago-storage-data
@@ -105,6 +107,5 @@ spec:
         - name: lago-storage-data
           persistentVolumeClaim:
             claimName: lago-apiworker-data
-status: {}
 
 
