@@ -5,25 +5,18 @@
 - EBS CSI DRIVER `Will be added in CICD` [@OfficialDocumentation](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html)
 
 
-### **Kustomization**
-
-We're using kustomization to deploy all the ressources, in the main root there's `kustomization.yaml` that specifies every deployment/service/pvc folder and also using it for secrets/configmap.
-
-
-Add them to your repository's secrets : 
-
-- Go to your repository's settings.
-
-- Under the settings, navigate to the 'Secrets' section.
-
-- Click on 'New repository secret' or 'Add a secret environment' button.
-
-- For the name, enter `LAGO_API_URL` and the other variables.
 
 ### **Kustomization**
 
 We're using kustomization to deploy all the ressources, in the main root there's `kustomization.yaml` that specifies every deployment/service/pvc folder and also using it for secrets/configmap.
 
+
+**Why too many kustomization file**
+
+We have a file in the root called kustomization.yaml and it specifies the folder that has file manifests.
+Let's say we have 5 folder and each of them has X file of manifests, to apply all of them we'll have to `cd` to each folder and use `kustomize build . | kubectl apply -f -` so instead of this, we'll create a folder in the root that calls all the kustomizations in each folder and we won't need to `cd` to all of them. we'll just execute it in the root and all the manifests will be applied
+
+---
 
 Add them to your repository's secrets : 
 
@@ -42,19 +35,21 @@ These secrets and configmap has to be defined in a workflow `Github Actions` :
 ```
       - name: Create ConfigMap file
         run: |
+          cd Lago-K8S
           echo "LAGO_API_URL=${{ env.LAGO_API_URL }}" > configmap.env
           echo "LAGO_FRONT_URL=${{ env.LAGO_FRONT_URL }}" >> configmap.env
-          echo "LAGO_REDIS_URL=${{ env.LAGO_FRONT_URL }}" >> configmap.env
-          echo "LAGO_PDF_URL=${{ env.LAGO_FRONT_URL }}" >> configmap.env
+          echo "LAGO_REDIS_URL=${{ env.LAGO_REDIS_URL }}" >> configmap.env
+          echo "LAGO_PDF_URL=${{ env.LAGO_PDF_URL }}" >> configmap.env
 
 
       - name: Create secrets file
         run: |
+          cd Lago-K8S
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" > secret.env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> secret.env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> secret.env
+          echo "DATABASE_URL=postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@app-lago-postgres:5432/${{ secrets.POSTGRES_DB }}" >> secret.env
           echo "API_SECRET=${{ secrets.API_SECRET }}" >> secret.env
-          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> secret.env
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_DB }}" >> secret.env
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_DB }}" >> secret.env
-          echo "DATABASE_URL=postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@db:5432/${{ secrets.POSTGRES_DB }}" >> secret.env 
 
 ```
 in `DATABASE_URL`, @`DB` has to match to postgres service's name and since we have `namePrefix: app-` in kustomization.yaml then it'll be `app-lago-postgres` (by default)
@@ -142,7 +137,7 @@ If you want to delete all the resources:
 
 ---
 
-For the RSA_PRIVATE_KEY **All of them**
+For the RSA_PRIVATE_KEY
 
 First you have to generate an RSA with :
 
