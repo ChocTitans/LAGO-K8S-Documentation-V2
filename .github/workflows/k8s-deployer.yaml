@@ -28,8 +28,8 @@ jobs:
       - name: Create secrets file
         run: |
           cd ./k8s
-          echo "Creating secret.env"
-          for secret_name in $(echo "$SECRET_NAMES" | tr ',' ' '); do
+          IFS=',' read -ra secret_array <<< "$SECRET_NAMES"
+          for secret_name in "${secret_array[@]}"; do
             secret_value="${{ secrets[secret_name] }}"
             echo "$secret_name=$secret_value" >> secret.env
           done
