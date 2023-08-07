@@ -2,7 +2,7 @@
 
 ### **Requirements**
 
-- EBS CSI DRIVER `Will be added in CICD` [@OfficialDocumentation](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html)
+- EBS CSI DRIVER `Will be added in IaC` [@OfficialDocumentation](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html)
 
 
 
