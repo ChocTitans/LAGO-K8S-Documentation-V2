@@ -29,8 +29,8 @@ jobs:
         run: |
           cd ./k8s
           echo "Creating secret.env"
-          for secret_name in $(echo "${{ secrets.SECRET_NAMES }}" | tr ',' ' '); do
-            secret_value="${{ secrets[$secret_name] }}"
+          for secret_name in $(echo "$SECRET_NAMES" | tr ',' ' '); do
+            secret_value="${{ secrets[secret_name] }}"
             echo "$secret_name=$secret_value" >> secret.env
           done
           echo "Exported secrets:"
