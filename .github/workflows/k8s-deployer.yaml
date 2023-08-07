@@ -30,7 +30,7 @@ jobs:
           SECRETS: '${{ toJson(secrets) }}'
         run: |
           cd ./k8s
-          touch secret.env
+          echo "DATABASE_URL=postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@app-lago-postgres:5432/${{ secrets.POSTGRES_DB }}" > secret.env
           for secret in $(echo "$SECRETS" | jq -r 'keys[]'); do
             value="$(jq -r --arg key "$secret" '.[$key]' <<< "$SECRETS")"
             echo "$secret=$value" >> secret.env
@@ -39,10 +39,7 @@ jobs:
       - name: Create ConfigMap file
         run: |
           cd ./k8s
-          echo "LAGO_API_URL=${{ vars.LAGO_API_URL }}" > configmap.env
-          echo "LAGO_FRONT_URL=${{ vars.LAGO_FRONT_URL }}" >> configmap.env
-          echo "LAGO_REDIS_URL=${{ vars.LAGO_REDIS_URL }}" >> configmap.env
-          echo "LAGO_PDF_URL=${{ vars.LAGO_PDF_URL }}" >> configmap.env
+          env > configmap.env
 
 
       - name: Kustomize build & apply
