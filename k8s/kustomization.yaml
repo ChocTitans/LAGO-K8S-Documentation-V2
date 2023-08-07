@@ -6,7 +6,6 @@ metadata:
 commonLabels:
   app: lago
 
-  
 resources:
 - ./postgres
 - ./api
