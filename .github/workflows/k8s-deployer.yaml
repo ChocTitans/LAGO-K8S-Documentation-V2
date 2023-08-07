@@ -29,8 +29,10 @@ jobs:
         run: |
           cd ./k8s
           echo "Creating secret.env"
-          for secret_name in $(echo "$SECRET_NAMES" | tr ',' ' '); do
-            secret_value=$(echo "${{ secrets["$secret_name"] }}" | jq -r .)
+          > secret.env # Create an empty secret.env file
+          IFS=',' read -ra secret_array <<< "$SECRET_NAMES"
+          for secret_name in "${secret_array[@]}"; do
+            secret_value="${{ secrets[secret_name] }}"
             echo "$secret_name=$secret_value" >> secret.env
           done
           echo "Exported secrets:"
