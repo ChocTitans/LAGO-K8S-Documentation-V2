@@ -36,11 +36,12 @@ jobs:
           done
 
       - name: Generate configmap.env
+        working-directory: ./k8s
         run: |
           for var in $(compgen -e); do
             echo "${var}=${!var}" >> configmap.env
           done
-          
+
       - name: Kustomize build & apply
         run: |
           cd ./k8s
