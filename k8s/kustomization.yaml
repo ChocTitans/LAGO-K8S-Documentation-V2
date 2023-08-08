@@ -24,3 +24,5 @@ configMapGenerator:
 - name: lago-configmap
   envs:
   - configmap.env
+
+  
