@@ -13,3 +13,8 @@ resources:
 - ./front
 - ./pdf
 - ./network
+
+secretGenerator:
+- name: lago-secret
+  envs:
+  - secret.env
