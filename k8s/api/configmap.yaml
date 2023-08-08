@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lago-configmap
+  labels:
+    app.kubernetes.io/name: lago-configmap
+    app.kubernetes.io/instance: lago-configmap
+data:
+  LAGO_API_URL: "http://localhost:3000"
+  LAGO_FRONT_URL: "http://localhost"
+  LAGO_REDIS_URL: "redis://app-lago-redis:6379"
+  LAGO_PDF_URL: "http://localhost:3000"
