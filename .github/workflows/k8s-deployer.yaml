@@ -1,42 +1,16 @@
 name: Workflow for deployment of a service in K8S
 on: 
     workflow_dispatch:
-
 jobs:
-  setup_config_secret:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION }}
-
-      - name: Update kube config
-        run: aws eks update-kubeconfig --name ${{ vars.AWS_NAME_CLUSTER }} --region ${{ vars.AWS_REGION }}
-
-      - name: Install kustomize
-        run: |
-          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
-          sudo mv kustomize /usr/local/bin/
-
-      - name: Create Secret file
-        env:
-          SECRETS: '${{ toJson(secrets) }}'
-        working-directory: ./k8s
-        run: |
-          touch secret.env
-          for secret in $(echo "$SECRETS" | jq -r 'keys[]'); do
-            value="$(jq -r --arg key "$secret" '.[$key]' <<< "$SECRETS")"
-            echo "$secret=$value" >> secret.env
-          done
-
-      - name: Kustomize build & apply
-        run: |
-          cd ./k8s
-          kustomize build . | kubectl apply -f -
+    - uses: actions/checkout@v2
+    - name: build using custom actions
+      uses : ChocTitans/composite-action@composite
+      with :
+       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+       aws-cluster-name: ${{ vars.AWS_NAME_CLUSTER }}
+       aws-region: ${{ vars.AWS_REGION }}
+       secrets: ${{ toJson(secrets) }}
