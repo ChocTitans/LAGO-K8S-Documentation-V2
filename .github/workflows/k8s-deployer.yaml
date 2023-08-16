@@ -14,3 +14,4 @@ jobs:
        aws-cluster-name: ${{ vars.AWS_NAME_CLUSTER }}
        aws-region: ${{ vars.AWS_REGION }}
        secrets: ${{ toJson(secrets) }}
+       vars: ${{ toJson(vars) }}
