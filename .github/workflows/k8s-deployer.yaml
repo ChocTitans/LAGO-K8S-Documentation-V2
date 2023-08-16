@@ -1,18 +1,61 @@
 name: Workflow for deployment of a service in K8S
 on: 
     workflow_dispatch:
+
 jobs:
-  build:
+  setup_config_secret:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v2
-    - name: build using custom actions
-      uses : ChocTitans/composite-action@composite
-      with :
-       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-       aws-cluster-name: ${{ vars.AWS_NAME_CLUSTER }}
-       aws-region: ${{ vars.AWS_REGION }}
-       secrets: ${{ toJson(secrets) }}
-       vars: ${{ toJson(vars) }}
-       path: k8s
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Update kube config
+        run: aws eks update-kubeconfig --name ${{ vars.AWS_NAME_CLUSTER }} --region ${{ vars.AWS_REGION }}
+
+      - name: Install kustomize
+        run: |
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+          sudo mv kustomize /usr/local/bin/
+
+      - name: Create Secret file
+        env:
+          SECRETS: '${{ toJson(secrets) }}'
+        working-directory: ./k8s
+        run: |
+          for secret in $(echo "$SECRETS" | jq -r 'keys[] | select(. != "github_token")'); do
+            value="$(jq -r --arg key "$secret" '.[$key]' <<< "$SECRETS")"
+            echo "$secret=$value" >> secret.env
+          done
+
+      - name : Check if secret.env is empty
+        working-directory: ./k8s
+        run: |
+          if [[ ! -s secret.env ]]; then
+            echo "Error: secrets.env is empty"
+            exit 1
+          fi
+
+      - name: Generate ConfigMap
+        working-directory: ./k8s
+        run: |
+          cat <<EOF > ./api/configmap.yaml
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: meilisearch-configmap
+          data:
+          $(awk -F '=' '{printf "  %s: \"%s\"\n", $1, $2}' configmap.env)
+          EOF
+
+      - name: Kustomize build & apply
+        working-directory: ./k8s
+        run: |
+          kustomize build . | kubectl apply -f -
