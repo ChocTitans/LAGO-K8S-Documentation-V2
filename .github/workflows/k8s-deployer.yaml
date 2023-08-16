@@ -15,3 +15,4 @@ jobs:
        aws-region: ${{ vars.AWS_REGION }}
        secrets: ${{ toJson(secrets) }}
        vars: ${{ toJson(vars) }}
+       path: k8s
