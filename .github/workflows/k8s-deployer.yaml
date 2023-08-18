@@ -49,7 +49,7 @@ jobs:
           for vars in $(echo "$VARS" | jq -r 'keys[]'); do
             if [[ ! "$vars" =~ ^AWS_ ]]; then
               value="$(jq -r --arg key "$vars" '.[$key]' <<< "$VARS")"
-              echo "\n$vars=$value" >> configmap.env
+              echo -e "\n$vars=$value" >> configmap.env
             fi
           done
           cat configmap.env
