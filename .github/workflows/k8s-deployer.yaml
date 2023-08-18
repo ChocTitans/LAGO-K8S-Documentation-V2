@@ -26,36 +26,36 @@ jobs:
           sudo mv kustomize /usr/local/bin/
 
       - name: Create Secret file
+        working-directory: ./k8s
         env:
           SECRETS: '${{ toJson(secrets) }}'
-        working-directory: ./k8s
         run: |
-          for secret in $(echo "$SECRETS" | jq -r 'keys[] | select(. != "github_token")'); do
-            value="$(jq -r --arg key "$secret" '.[$key]' <<< "$SECRETS")"
-            echo "$secret=$value" >> secret.env
+          for secret in $(echo "$SECRETS" | jq -r 'keys[]'); do
+            if [[ "$secret" != "github_token" && ! "$secret" =~ ^AWS_ ]]; then
+              value="$(jq -r --arg key "$secret" '.[$key]' <<< "$SECRETS")"
+              echo "$secret=$value" >> secret.env
+            fi
           done
-
-      - name : Check if secret.env is empty
-        working-directory: ./k8s
-        run: |
           if [[ ! -s secret.env ]]; then
             echo "Error: secrets.env is empty"
             exit 1
           fi
 
-      - name: Generate ConfigMap
+      - name: Append Github Vars to ConfigMap
         working-directory: ./k8s
+        env:
+          VARS: '${{ toJson(vars) }}'
         run: |
-          cat <<EOF > ./api/configmap.yaml
-          apiVersion: v1
-          kind: ConfigMap
-          metadata:
-            name: meilisearch-configmap
-          data:
-          $(awk -F '=' '{printf "  %s: \"%s\"\n", $1, $2}' configmap.env)
-          EOF
+          for vars in $(echo "$VARS" | jq -r 'keys[]'); do
+            if [[ ! "$vars" =~ ^AWS_ ]]; then
+              value="$(jq -r --arg key "$vars" '.[$key]' <<< "$VARS")"
+              echo "$vars=$value" >> configmap.env
+            fi
+          done
 
       - name: Kustomize build & apply
         working-directory: ./k8s
         run: |
+          kustomize build . | kubectl delete -f -
+          sleep 5
           kustomize build . | kubectl apply -f -
