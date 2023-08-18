@@ -52,7 +52,7 @@ jobs:
               echo "$vars=$value" >> configmap.env
             fi
           done
-
+          cat configmap.env
       - name: Kustomize build & apply
         working-directory: ./k8s
         run: |
