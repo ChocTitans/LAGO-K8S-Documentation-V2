@@ -7,7 +7,7 @@ metadata:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/group.name: ttv-eks
-    alb.ingress.kubernetes.io/certificate-arn:  # Certificate ARN in ACM (for your domain)
+    alb.ingress.kubernetes.io/certificate-arn:  # Certificate ARN in ACM (for your domain, delete this comment)
     alb.ingress.kubernetes.io/ssl-redirect: '443'
 
 spec:

@@ -97,7 +97,7 @@ spec:
                   key: API_SECRET
             - name: SECRET_KEY_BASE
               value: ${SECRET_KEY_BASE:-your-secret-key-base-hex-64}
-          image: getlago/api:v0.40.0-beta
+          image: "getlago/api:$IMAGE_VERSION"
           name: lago-api-worker
           volumeMounts:
             - mountPath: /app/storage

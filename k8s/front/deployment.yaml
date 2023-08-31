@@ -29,7 +29,7 @@ spec:
               value: https://proxy.getlago.com
             - name: SENTRY_DSN
               value: ${SENTRY_DSN_FRONT}
-          image: getlago/front:v0.40.0-beta
+          image: "getlago/front:$IMAGE_VERSION"
           name: lago-front
           ports:
             - containerPort: 80

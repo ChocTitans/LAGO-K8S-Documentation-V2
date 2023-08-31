@@ -8,4 +8,4 @@ spec:
       port: 80
       targetPort: 80
   selector:
-    app.kubernetes.io/name: lago-front 
+    app.kubernetes.io/name: lago-front
